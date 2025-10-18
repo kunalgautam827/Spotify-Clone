@@ -1,0 +1,45 @@
+.border {
+
+  margin: 3px;
+}
+
+.flex {
+  display: flex;
+
+}
+
+.bg-gray {
+  background-color: #1f1f1f;
+}
+
+.round {
+  border-radius: 10px;
+}
+
+.invert {
+  filter: invert(1);
+}
+
+
+/* scroll bar's css */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0e0e0e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2e2e2e;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.cardContainer::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
