@@ -12,8 +12,12 @@ function formatTime(seconds) {
 }
 
 async function getSongs(folder) {
+  folder=decodeURIComponent(folder)
+  
   currentFolder = folder;
-  tempFolder = folder.replace("%5C", " ");
+  
+  tempFolder = folder // add decode uri component latter;
+  
 
   let a = await fetch(`/${folder}`);
   let response = await a.text();
@@ -26,9 +30,13 @@ async function getSongs(folder) {
 
   for (let index = 0; index < as.length; index++) {
     const element = as[index];
-    if (element.href.endsWith(".mp3")) {
-      tempFolder = currentFolder.replace("/", "%5C").replace(" ", "%20");
-      songs.push(element.href.split(`${tempFolder}`)[1]);
+    
+    if (decodeURIComponent(element.href).endsWith(".mp3")) {
+      
+      
+      tempFolder = decodeURIComponent(currentFolder);
+     
+      songs.push(decodeURIComponent(element.href).split(`${tempFolder}`)[1]);
     }
   }
 
@@ -77,7 +85,7 @@ const playMusic = (track, pause = false) => {
 
 // display albums
 async function displayAlbums() {
-  let a = await fetch(`/songs/`);
+  let a = await fetch(`\\songs\\`);
   let response = await a.text();
 
   let div = document.createElement("div");
@@ -88,18 +96,19 @@ async function displayAlbums() {
 
   for (let index = 0; index < array.length; index++) {
     const e = array[index];
-
-    if (e.href.includes("%5Csongs%5C")) {
+    
+    if (decodeURIComponent(e.href).includes("\\songs\\")) {
       let folder = decodeURIComponent(
-        e.href.split("%5Csongs%5C")[1].replace("/", "")
-      );
-
+         e.href.split("songs")[1]
+      );      
+      folder = folder.replace("/","\\");
+      
       try {
-        let a = await fetch(`/songs/${folder}/info.json`);
+        let a = await fetch(`\\songs\\${folder}\\info.json`);
         let response = await a.json();
 
         cardContainer.innerHTML += `
-          <div data-folder="songs/${folder}" class="card">
+          <div data-folder="songs${folder}" class="card">
             <button class="play">
               <svg viewBox="0 0 24 24">
                 <path d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606"></path>
@@ -118,7 +127,8 @@ async function displayAlbums() {
   // load playlist when card clicked
   Array.from(document.getElementsByClassName("card")).forEach((e) => {
     e.addEventListener("click", async (item) => {
-      songs = await getSongs(`${item.currentTarget.dataset.folder}%5C`);
+      
+      songs = await getSongs(`${item.currentTarget.dataset.folder}`);
       playMusic(songs[0]);
     });
   });
@@ -130,7 +140,7 @@ async function main() {
   const next = document.getElementById("next");
 
   // load first folder automatically
-  songs = await getSongs("songs/Diljit%20Dosanjh%5C");
+  songs = await getSongs("songs\\diljit dosanjh\\");
   playMusic(songs[0], true);
 
   // show all albums
@@ -166,7 +176,6 @@ async function main() {
 
   // hamburger open/close
   document.querySelector(".hamburger").addEventListener("click", () => {
-    console.log("hamburger is clicked");
     
     const left = document.querySelector(".left");
     left.style.left = left.style.left === "0px" ? "-110%" : "0";
@@ -178,7 +187,7 @@ async function main() {
   // previous
   previous.addEventListener("click", () => {
     currentSong.pause();
-    let index = songs.indexOf(currentSong.src.split("/").slice(-1)[0]);
+    let index = songs.indexOf(decodeURIComponent(currentSong.src).split("/").slice(-1)[0]);
     if (index - 1 >= 0) {
       playMusic(songs[index - 1]);
     } else {
@@ -189,7 +198,8 @@ async function main() {
   // next
   next.addEventListener("click", () => {
     currentSong.pause();
-    let index = songs.indexOf(currentSong.src.split("/").slice(-1)[0]);
+    let index = songs.indexOf(decodeURIComponent(currentSong.src).split("/").slice(-1)[0]);
+    
     if (index + 1 < songs.length) {
       playMusic(songs[index + 1]);
     } else {
